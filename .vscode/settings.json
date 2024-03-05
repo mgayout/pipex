@@ -1,0 +1,9 @@
+{
+    "42header.username": "mgayout",
+    "42header.email": "mgayout@student.42nice.fr",
+    "editor.tabCompletion": "off",
+    "editor.tabFocusMode": false,
+    "editor.insertSpaces": false,
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.autoSave": "afterDelay"
+}
