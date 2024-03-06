@@ -6,7 +6,7 @@
 #    By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/05 12:39:21 by mgayout           #+#    #+#              #
-#    Updated: 2024/03/05 15:28:09 by mgayout          ###   ########.fr        #
+#    Updated: 2024/03/06 15:29:14 by mgayout          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,8 @@ SRC_DIR	=	./src/
 LIBFT	=	./libft-/libft.a
 
 SRCS	=	src/main.c \
+			src/init_pipex.c \
+			src/children.c \
 
 all: $(LIBFT) $(NAME)
 

@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/05 19:08:44 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/06 17:49:32 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,71 +15,60 @@
 int	main(int argc, char **argv, char *envp[])
 {
 	t_pipex	pipex;
+	int		pipefd[2];
 
 	if (argc != 5)
-		error("Erreur de syntaxe.");
-	parse(pipex, argv, envp);
-	/*char	*path = ft_strjoin("/bin/", argv[2]);
-	char	*args[] = { argv[2], argv[1], NULL };
-	char	*args2[] = { argv[4], argv[5], NULL };
-	char	*env[] = { NULL };
-	execve(path, args, env);
-	free(path);
-	path = ft_strjoin("/bin/", argv[4]);
-	execve(path, args2, env);
-	free(path);*/
+		error(&pipex, "Erreur de syntaxe.");
+	if (pipe(pipefd) == -1)
+		error(&pipex, "Erreur de pipe");
+	init_pipex(&pipex, argv, envp);
+	children(&pipex, pipefd, envp);
+	close(pipefd[0]);
+	close(pipefd[1]);
+	//ft_printf("wfw\n");
+	free_pipex(&pipex);
+	close(pipex.infile);
+	close(pipex.outfile);
+	free(pipex.cmd1_path);
+	free(pipex.cmd2_path);
 	return (0);
 }
 
-void	parse(t_pipex pipex, char **argv, char **envp)
-{
-	pipex.infile = open(argv[1], O_RDONLY);
-	if (pipex.infile == -1)
-		error("Erreur infile.");
-	pipex.outfile = open(argv[4], O_CREAT | O_RDWR);
-	if (pipex.infile == -1)
-		error("Erreur outfile.");
-	pipex.path = ft_split(find_path(envp), ':');
-	pipex.cmd1 = ft_split(argv[2], ' ');
-	pipex.cmd2 = ft_split(argv[3], ' ');
-	pipex.cmd1_path = check_cmd(pipex, pipex.cmd1);
-	ft_printf("%s\n", pipex.cmd1_path);
-	pipex.cmd2_path = check_cmd(pipex, pipex.cmd2);
-	ft_printf("%s\n", pipex.cmd2_path);
-}
-
-char	*check_cmd(t_pipex pipex, char **cmd)
-{
-	char	*tmp;
-	char	*path;
-	int		i;
-
-	i = 0;
-	while (pipex.path[i] != NULL)
-	{
-		tmp = ft_strjoin(pipex.path[i], "/");
-		path = ft_strjoin(tmp, cmd[0]);
-		if (access(path, 0) == 0)
-			return (path);
-		i++;
-	}
-	return (NULL);
-}
-
-char	*find_path(char	**envp)
+void	free_pipex(t_pipex *pipex)
 {
 	int	i;
+	int	j;
+	int	k;
 
-	i = ft_strlen("PATH=");
-	while (ft_strncmp("PATH=", *envp, i))
-		envp++;
-	if (*envp == NULL)
-		error("Erreur envp");
-	return (*envp + i);
+	i = 0;
+	j = 0;
+	k = 0;
+	while(pipex->cmd1[i] != NULL && pipex->cmd2[j] != NULL && pipex->path[k] != NULL)
+	{
+		if (pipex->cmd1[i] != NULL)
+		{
+			free(pipex->cmd1[i]);
+			i++;
+		}
+		if (pipex->cmd2[j] != NULL)
+		{
+			free(pipex->cmd2[j]);
+			j++;
+		}
+		if (pipex->path[k] != NULL)
+		{
+			free(pipex->path[k]);
+			k++;
+		}
+	}
+	free(pipex->cmd1);
+	free(pipex->cmd2);
+	free(pipex->path);
 }
 
-void	error(char *msg)
+void	error(t_pipex *pipex, char *msg)
 {
-	ft_printf("%s\n", msg);
+	perror(msg);
+	free_pipex(pipex);
 	exit (1);
 }

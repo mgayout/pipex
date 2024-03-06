@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:31 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/05 19:02:35 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/06 16:36:25 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 
 typedef struct s_pipex
 {
+	int			status;
 	int			infile;
 	int			outfile;
 	char		**path;
@@ -34,9 +35,20 @@ typedef struct s_pipex
 	char		*cmd2_path;
 }				t_pipex;
 
-void	parse(t_pipex pipex, char **argv, char **envp);
-void	error(char *msg);
-char	*find_path(char	**envp);
-char	*check_cmd(t_pipex pipex, char **cmd);
+//MAIN
+
+void	error(t_pipex *pipex, char *msg);
+void	free_pipex(t_pipex *pipex);
+
+//INIT_PIPEX
+
+void	init_pipex(t_pipex *pipex, char **argv, char **envp);
+char	*find_path(t_pipex *pipex, char	**envp);
+char	*check_cmd(t_pipex *pipex, char **cmd);
+
+//CHILDREN
+
+void	children(t_pipex *pipex, int *pipefd, char **envp);
+void	exec_cmd(t_pipex *pipex, char *cmd_path, char **cmd, char **envp, int *pipefd);
 
 #endif
