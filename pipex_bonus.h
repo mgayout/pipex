@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   pipex_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/05 12:42:31 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 12:00:53 by mgayout          ###   ########.fr       */
+/*   Created: 2024/03/07 12:21:50 by mgayout           #+#    #+#             */
+/*   Updated: 2024/03/07 15:46:54 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
 
 # include "libft-/libft.h"
 # include "libft-/ft_printf+/ft_printf.h"
@@ -25,17 +25,15 @@
 
 typedef struct s_pipex
 {
-	pid_t		pid1;
-	pid_t		pid2;
+	int			status;
+	int			*pid;
 	int			pipefd[2];
 	int			infile;
 	int			outfile;
 	char		*path;
 	char		**path_cmd;
-	char		**cmd1;
-	char		*cmd1_path;
-	char		**cmd2;
-	char		*cmd2_path;
+	char		**cmd;
+	char		*cmd_path;
 }				t_pipex;
 
 //MAIN
@@ -47,15 +45,16 @@ void	close_pipe(t_pipex *pipex);
 
 //INIT_PIPEX
 
-void	init_pipex(t_pipex *pipex, char **argv, char **envp);
+void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp, int i);
 char	*find_path(t_pipex *pipex, char	**envp);
 char	*check_cmd(t_pipex *pipex, char **cmd);
 
 //CHILDREN&PARENT
 
 void	parent(t_pipex *pipex);
-void	children(t_pipex *pipex, char **envp, pid_t pid1, pid_t pid2);
-void	exec_cmd1(t_pipex *pipex, char **envp);
-void	exec_cmd2(t_pipex *pipex, char **envp);
+void	children(t_pipex *pipex, char **envp, pid_t pid, int i);
+void	exec_cmd_0(t_pipex *pipex, char **envp);
+void	exec_cmd_1(t_pipex *pipex, char **envp);
+void	exec_cmd_2(t_pipex *pipex, char **envp);
 
 #endif

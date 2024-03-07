@@ -1,39 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 12:17:21 by mgayout          ###   ########.fr       */
+/*   Created: 2024/03/07 12:21:08 by mgayout           #+#    #+#             */
+/*   Updated: 2024/03/07 15:45:14 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../../pipex_bonus.h"
 
 int	main(int argc, char **argv, char *envp[])
 {
 	t_pipex	pipex;
+	int		i;
 
-	if (argc != 5)
-		error_msg("Error\nThis program needs 5 args.\n");
+	i = 0;
+	pipex.status = 0;
+	if (argc < 5)
+		error_msg("Error\nThis program needs at least 5 args.\n");
 	if (pipe(pipex.pipefd) < 0)
 		error_msg("pipe");
-	pipex.pid1 = fork();
-	if (pipex.pid1 == -1)
-		error_msg("fork.");
-	if (pipex.pid1 != 0)
+	init_pipex(&pipex, argc, argv, envp, i);
+	while (i != (argc - 3))
 	{
-		pipex.pid2 = fork();
-		if (pipex.pid2 == -1)
-			error_msg("fork.");
+		pipex.pid[i] = fork();
+		init_pipex(&pipex, argc, argv, envp, i);
+		if (pipex.pid[i] == 0)
+		{
+			ft_printf("ok\n");
+			ft_printf("%s\n", pipex.cmd_path);
+			ft_printf("%d\n", i);
+			waitpid(pipex.pid[i - 1], NULL, 0);
+			children(&pipex, envp, pipex.pid[i], i);
+		}
+		i++;
 	}
-	init_pipex(&pipex, argv, envp);
-	if (pipex.pid1 == 0 || pipex.pid2 == 0)
-		children(&pipex, envp, pipex.pid1, pipex.pid2);
-	else
-		parent(&pipex);
+	waitpid(pipex.pid[argc], NULL, 0);
+	parent(&pipex);
 	return (0);
 }
 
@@ -41,25 +47,18 @@ void	free_pipex(t_pipex *pipex)
 {
 	int	i;
 	int	j;
-	int	k;
 
 	i = 0;
 	j = 0;
-	k = 0;
-	while (pipex->cmd1[i] != NULL)
+	while (pipex->cmd[i] != NULL)
 	{
-		while (pipex->cmd2[j] != NULL)
+		while (pipex->path_cmd[j] != NULL)
 		{
-			while (pipex->path_cmd[k] != NULL)
-			{
-				free(pipex->path_cmd[k]);
-				k++;
-			}
-			free(pipex->cmd2[j]);
+			free(pipex->path_cmd[j]);
 			j++;
 		}
-		free(pipex->cmd1[i]);
-		i++;
+	free(pipex->cmd[i]);
+	i++;
 	}
 }
 
@@ -73,11 +72,9 @@ void	error(t_pipex *pipex, char *msg)
 {
 	free_pipex(pipex);
 	free(pipex->path);
-	free(pipex->cmd1);
-	free(pipex->cmd2);
+	free(pipex->cmd);
 	free(pipex->path_cmd);
-	free(pipex->cmd1_path);
-	free(pipex->cmd2_path);
+	free(pipex->cmd_path);
 	error_msg(msg);
 }
 
