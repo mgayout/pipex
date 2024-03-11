@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:21:50 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 15:46:54 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/11 18:41:24 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,10 @@
 typedef struct s_pipex
 {
 	int			status;
-	int			*pid;
-	int			pipefd[2];
+	int			pid;
+	int			*pipefd;
+	int			nb_cmd;
+	int			nb_pipe;
 	int			infile;
 	int			outfile;
 	char		*path;
@@ -48,13 +50,14 @@ void	close_pipe(t_pipex *pipex);
 void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp, int i);
 char	*find_path(t_pipex *pipex, char	**envp);
 char	*check_cmd(t_pipex *pipex, char **cmd);
+void	init_pipe(t_pipex *pipex);
 
 //CHILDREN&PARENT
 
 void	parent(t_pipex *pipex);
-void	children(t_pipex *pipex, char **envp, pid_t pid, int i);
+void	children(t_pipex *pipex, char **envp, int i);
 void	exec_cmd_0(t_pipex *pipex, char **envp);
-void	exec_cmd_1(t_pipex *pipex, char **envp);
-void	exec_cmd_2(t_pipex *pipex, char **envp);
+void	exec_cmd_1(t_pipex *pipex, char **envp, int i);
+void	exec_cmd_2(t_pipex *pipex, char **envp, int i);
 
 #endif

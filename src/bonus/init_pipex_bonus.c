@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:23:02 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 14:46:50 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/11 18:42:37 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@ void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp, int i)
 {
 	if (pipex->status == 0)
 	{
-		pipex->pid = malloc((argc - 3) * sizeof(pid_t));
+		//pipex->pid = malloc((argc - 3) * sizeof(pid_t));
+		pipex->nb_cmd = argc - 3;
+		pipex->nb_pipe = (pipex->nb_cmd - 1) * 2;
+		pipex->pipefd = malloc(sizeof(int) * pipex->nb_pipe);
 		pipex->infile = open(argv[1], O_RDONLY);
 		if (pipex->infile == -1)
 			error_msg("Erreur infile.");
@@ -33,7 +36,7 @@ void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp, int i)
 		pipex->status += 1;
 		pipex->cmd_path = check_cmd(pipex, pipex->cmd);
 		if (!pipex->cmd_path)
-			error_msg("Error\nWrong command.\n");	
+			error_msg("Error\nWrong command.\n");
 	}
 }
 
@@ -67,4 +70,17 @@ char	*check_cmd(t_pipex *pipex, char **cmd)
 		i++;
 	}
 	return (NULL);
+}
+
+void	init_pipe(t_pipex *pipex)
+{
+	int	i;
+
+	i = 0;
+	while (i != pipex->nb_pipe)
+	{
+		if (pipe(pipex->pipefd + 2 * i) < 0)
+			error_msg("pipe");
+		i++;
+	}
 }
