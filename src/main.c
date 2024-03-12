@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 12:17:21 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/12 11:14:17 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ int	main(int argc, char **argv, char *envp[])
 		error_msg("Error\nThis program needs 5 args.\n");
 	if (pipe(pipex.pipefd) < 0)
 		error_msg("pipe");
+	init_pipex(&pipex, argv, envp);
 	pipex.pid1 = fork();
 	if (pipex.pid1 == -1)
 		error_msg("fork.");
@@ -29,7 +30,6 @@ int	main(int argc, char **argv, char *envp[])
 		if (pipex.pid2 == -1)
 			error_msg("fork.");
 	}
-	init_pipex(&pipex, argv, envp);
 	if (pipex.pid1 == 0 || pipex.pid2 == 0)
 		children(&pipex, envp, pipex.pid1, pipex.pid2);
 	else
@@ -72,7 +72,6 @@ void	close_pipe(t_pipex *pipex)
 void	error(t_pipex *pipex, char *msg)
 {
 	free_pipex(pipex);
-	free(pipex->path);
 	free(pipex->cmd1);
 	free(pipex->cmd2);
 	free(pipex->path_cmd);

@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 09:46:19 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 12:28:27 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/12 11:05:20 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,17 @@ void	init_pipex(t_pipex *pipex, char **argv, char **envp)
 		error_msg("Erreur outfile.");
 	pipex->path = find_path(pipex, envp);
 	pipex->path_cmd = ft_split(pipex->path, ':');
+	//free(pipex->path_cmd);
 	pipex->cmd1 = ft_split(argv[2], ' ');
+	//free(pipex->cmd1);
 	pipex->cmd2 = ft_split(argv[3], ' ');
+	//free(pipex->cmd2);
 	pipex->cmd1_path = check_cmd(pipex, pipex->cmd1);
+	//free(pipex->cmd1_path);
 	if (!pipex->cmd1_path)
 		error_msg("Error\nWrong command.\n");
 	pipex->cmd2_path = check_cmd(pipex, pipex->cmd2);
+	//free(pipex->cmd2_path);
 	if (!pipex->cmd2_path)
 		error_msg("Error\nWrong command.\n");
 }
