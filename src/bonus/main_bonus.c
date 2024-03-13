@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:21:08 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/12 18:53:30 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 15:18:33 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,44 +15,36 @@
 int	main(int argc, char **argv, char *envp[])
 {
 	t_pipex	pipex;
-	int		i;
 
-	i = 0;
+	if (*envp == NULL)
+		exit(1);
+	pipex.argc = argc;
 	pipex.status = 0;
 	if (argc < 5)
-		error_msg("Error\nThis program needs at least 5 args.\n");
-	init_pipex(&pipex, argc, argv, envp, i);
+		error_msg("Error\nThis program needs at least 5 args.\n", 0);
+	init_pipex(&pipex, argc, argv, envp);
 	init_pipe(&pipex);
-	//if (pipex.heredoc == 1)
-		//heredoc(&pipex, argv[2]);
-	while (i != pipex.nb_cmd)
+	while (pipex.status < pipex.nb_cmd)
 	{
-		ft_printf("%d\n", i);
-		init_pipex(&pipex, argc, argv, envp, i);
-		children(&pipex, envp, i);
 		pipex.status += 1;
-		i++;
+		children(&pipex, argv, envp, pipex.status - 1);
 	}
-	parent(&pipex);
+	close_pipe(&pipex);
+	waitpid(-1, NULL, 0);
+	free_parent(&pipex);
 	return (0);
 }
 
-void	free_pipex(t_pipex *pipex)
+void	init_pipe(t_pipex *pipex)
 {
 	int	i;
-	int	j;
 
 	i = 0;
-	j = 0;
-	while (pipex->cmd[i] != NULL)
+	while (i < pipex->nb_cmd - 1)
 	{
-		while (pipex->path_cmd[j] != NULL)
-		{
-			free(pipex->path_cmd[j]);
-			j++;
-		}
-	free(pipex->cmd[i]);
-	i++;
+		if (pipe(pipex->pipefd + 2 * i) < 0)
+			free_parent(pipex);
+		i++;
 	}
 }
 
@@ -68,17 +60,11 @@ void	close_pipe(t_pipex *pipex)
 	}
 }
 
-void	error(t_pipex *pipex, char *msg)
+void	error_msg(char *msg, int status)
 {
-	free_pipex(pipex);
-	free(pipex->cmd);
-	free(pipex->path_cmd);
-	free(pipex->cmd_path);
-	error_msg(msg);
-}
-
-void	error_msg(char *msg)
-{
-	perror(msg);
+	if (status == 0)
+		write(2, msg, ft_strlen(msg));
+	else
+		perror(msg);
 	exit (1);
 }

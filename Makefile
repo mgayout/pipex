@@ -6,7 +6,7 @@
 #    By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/05 12:39:21 by mgayout           #+#    #+#              #
-#    Updated: 2024/03/07 14:23:55 by mgayout          ###   ########.fr        #
+#    Updated: 2024/03/13 14:39:38 by mgayout          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,10 +22,12 @@ LIBFT	=	./libft-/libft.a
 SRCS	=	src/main.c \
 			src/init_pipex.c \
 			src/children_parent.c \
+			src/free.c \
 
 SRCS_B	=	src/bonus/main_bonus.c \
 			src/bonus/init_pipex_bonus.c \
-			src/bonus/children_parent_bonus.c \
+			src/bonus/children_bonus.c \
+			src/bonus/free_bonus.c \
 
 all: $(LIBFT) $(NAME)
 

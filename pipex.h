@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:31 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/07 12:00:53 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 14:58:32 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,37 +25,37 @@
 
 typedef struct s_pipex
 {
-	pid_t		pid1;
-	pid_t		pid2;
+	pid_t		pid;
 	int			pipefd[2];
 	int			infile;
 	int			outfile;
 	char		*path;
 	char		**path_cmd;
-	char		**cmd1;
-	char		*cmd1_path;
-	char		**cmd2;
-	char		*cmd2_path;
+	char		**cmd;
+	char		*cmd_path;
+	int			status;
 }				t_pipex;
 
 //MAIN
 
-void	error(t_pipex *pipex, char *msg);
-void	error_msg(char *msg);
-void	free_pipex(t_pipex *pipex);
 void	close_pipe(t_pipex *pipex);
+void	error_msg(char *msg, int status);
 
 //INIT_PIPEX
 
 void	init_pipex(t_pipex *pipex, char **argv, char **envp);
-char	*find_path(t_pipex *pipex, char	**envp);
+char	*find_path(char	**envp);
 char	*check_cmd(t_pipex *pipex, char **cmd);
 
 //CHILDREN&PARENT
 
-void	parent(t_pipex *pipex);
-void	children(t_pipex *pipex, char **envp, pid_t pid1, pid_t pid2);
-void	exec_cmd1(t_pipex *pipex, char **envp);
-void	exec_cmd2(t_pipex *pipex, char **envp);
+void	children(t_pipex *pipex, char **argv, char **envp);
+void	in_out(int in, int out);
+
+//FREE
+
+void	free_pipe(t_pipex *pipex);
+void	free_parent(t_pipex *pipex);
+void	free_children(t_pipex *pipex);
 
 #endif

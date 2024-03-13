@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/12 11:14:17 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 15:19:27 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,51 +16,22 @@ int	main(int argc, char **argv, char *envp[])
 {
 	t_pipex	pipex;
 
+	pipex.status = 0;
+	if (*envp == NULL)
+		exit(1);
 	if (argc != 5)
-		error_msg("Error\nThis program needs 5 args.\n");
-	if (pipe(pipex.pipefd) < 0)
-		error_msg("pipe");
+		error_msg("Error\nThis program needs 5 args.\n", 0);
 	init_pipex(&pipex, argv, envp);
-	pipex.pid1 = fork();
-	if (pipex.pid1 == -1)
-		error_msg("fork.");
-	if (pipex.pid1 != 0)
+	if (pipe(pipex.pipefd) < 0)
+		free_parent(&pipex);
+	while (pipex.status < 2)
 	{
-		pipex.pid2 = fork();
-		if (pipex.pid2 == -1)
-			error_msg("fork.");
+		children(&pipex, argv, envp);
+		pipex.status += 1;
 	}
-	if (pipex.pid1 == 0 || pipex.pid2 == 0)
-		children(&pipex, envp, pipex.pid1, pipex.pid2);
-	else
-		parent(&pipex);
+	waitpid(-1, NULL, 0);
+	free_parent(&pipex);
 	return (0);
-}
-
-void	free_pipex(t_pipex *pipex)
-{
-	int	i;
-	int	j;
-	int	k;
-
-	i = 0;
-	j = 0;
-	k = 0;
-	while (pipex->cmd1[i] != NULL)
-	{
-		while (pipex->cmd2[j] != NULL)
-		{
-			while (pipex->path_cmd[k] != NULL)
-			{
-				free(pipex->path_cmd[k]);
-				k++;
-			}
-			free(pipex->cmd2[j]);
-			j++;
-		}
-		free(pipex->cmd1[i]);
-		i++;
-	}
 }
 
 void	close_pipe(t_pipex *pipex)
@@ -69,19 +40,11 @@ void	close_pipe(t_pipex *pipex)
 	close(pipex->pipefd[1]);
 }
 
-void	error(t_pipex *pipex, char *msg)
+void	error_msg(char *msg, int status)
 {
-	free_pipex(pipex);
-	free(pipex->cmd1);
-	free(pipex->cmd2);
-	free(pipex->path_cmd);
-	free(pipex->cmd1_path);
-	free(pipex->cmd2_path);
-	error_msg(msg);
-}
-
-void	error_msg(char *msg)
-{
-	perror(msg);
+	if (status == 0)
+		write(2, msg, ft_strlen(msg));
+	else
+		perror(msg);
 	exit (1);
 }
