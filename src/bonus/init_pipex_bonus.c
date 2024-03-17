@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:23:02 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:15:48 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 16:52:21 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,14 @@
 void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp)
 {
 	init_file(pipex, argc, argv);
+	dup2(pipex->infile, STDIN_FILENO);
 	pipex->nb_cmd = (argc - 3) - pipex->heredoc;
-	pipex->nb_pipe = (pipex->nb_cmd - 1) * 2;
-	pipex->pipefd = (int *)malloc(sizeof(int) * pipex->nb_pipe);
-	if (!pipex->pipefd)
-		error_msg("Error\nMalloc failed.\n", 0);
+	pipex->pid = malloc(sizeof(int) * pipex->nb_cmd);
 	pipex->path = find_path(pipex, envp);
 	pipex->path_cmd = ft_split(pipex->path, ':');
 	if (!pipex->path_cmd)
 		free_pipe(pipex);
+	pipex->status = 0;
 }
 
 void	init_file(t_pipex *pipex, int argc, char **argv)
@@ -32,7 +31,7 @@ void	init_file(t_pipex *pipex, int argc, char **argv)
 	{
 		init_heredoc(pipex, argv[2]);
 		pipex->outfile = open(argv[argc - 1], O_WRONLY
-				| O_CREAT | O_APPEND, 0000644);
+				| O_CREAT | O_APPEND, 0777);
 		if (pipex->outfile == -1)
 			error_msg("Error\noutfile", 1);
 		pipex->heredoc = 1;
@@ -43,7 +42,7 @@ void	init_file(t_pipex *pipex, int argc, char **argv)
 		if (pipex->infile == -1)
 			error_msg("Error\ninfile", 1);
 		pipex->outfile = open(argv[argc - 1], O_CREAT
-				| O_RDWR | O_TRUNC, 0000644);
+				| O_RDWR | O_TRUNC, 0777);
 		if (pipex->outfile == -1)
 			error_msg("Error\noutfile", 1);
 		pipex->heredoc = 0;
@@ -55,7 +54,7 @@ void	init_heredoc(t_pipex *pipex, char *str)
 	char	*buf;
 	int		file;
 
-	file = open("temp", O_WRONLY | O_TRUNC | O_CREAT, 0000644);
+	file = open("temp", O_WRONLY | O_TRUNC | O_CREAT, 0777);
 	if (file == -1)
 		error_msg("Error\ninfile", 1);
 	while (1)
@@ -86,7 +85,7 @@ char	*find_path(t_pipex *pipex, char	**envp)
 	return (*envp + i);
 }
 
-char	*check_cmd(t_pipex *pipex, char **cmd)
+char	*check_cmd(t_pipex *pipex, char **cmd, char *str)
 {
 	char	*tmp;
 	char	*path;
@@ -103,5 +102,7 @@ char	*check_cmd(t_pipex *pipex, char **cmd)
 		free(path);
 		i++;
 	}
+	if (access(str, 0) == 0)
+		return (str);
 	return (NULL);
 }

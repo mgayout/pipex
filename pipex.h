@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:31 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:58:32 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 16:39:31 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ void	error_msg(char *msg, int status);
 
 void	init_pipex(t_pipex *pipex, char **argv, char **envp);
 char	*find_path(char	**envp);
-char	*check_cmd(t_pipex *pipex, char **cmd);
+char	*check_cmd(t_pipex *pipex, char **cmd, char *str);
 
 //CHILDREN&PARENT
 
-void	children(t_pipex *pipex, char **argv, char **envp);
-void	in_out(int in, int out);
+void	children1(t_pipex *pipex, char **argv, char **envp);
+void	children2(t_pipex *pipex, char **argv, char **envp);
 
 //FREE
 

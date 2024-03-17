@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:21:50 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:17:59 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 17:09:09 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,11 @@
 
 typedef struct s_pipex
 {
-	int			argc;
+	int			pipefd[2];
+	int			*pid;
 	int			heredoc;
 	int			status;
-	pid_t		pid;
-	int			*pipefd;
 	int			nb_cmd;
-	int			nb_pipe;
 	int			infile;
 	int			outfile;
 	char		*path;
@@ -42,8 +40,7 @@ typedef struct s_pipex
 
 //MAIN
 
-void	init_pipe(t_pipex *pipex);
-void	close_pipe(t_pipex *pipex);
+void	open_pipe(t_pipex *pipex, int argc, char **argv, char **envp);
 void	error_msg(char *msg, int status);
 
 //INIT_PIPEX
@@ -52,17 +49,17 @@ void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp);
 void	init_file(t_pipex *pipex, int argc, char **argv);
 void	init_heredoc(t_pipex *pipex, char *str);
 char	*find_path(t_pipex *pipex, char	**envp);
-char	*check_cmd(t_pipex *pipex, char **cmd);
+char	*check_cmd(t_pipex *pipex, char **cmd, char *str);
 
 //CHILDREN
 
-void	children(t_pipex *pipex, char **argv, char **envp, int i);
+void	children(t_pipex *pipex, int argc, char **argv, char **envp);
 void	in_out(int in, int out);
 
 //FREE
 
 void	free_pipe(t_pipex *pipex);
 void	free_parent(t_pipex *pipex);
-void	free_children(t_pipex *pipex, char **argv);
+void	free_children(t_pipex *pipex, int argc, char **argv);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 15:19:27 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 16:47:19 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int	main(int argc, char **argv, char *envp[])
 {
 	t_pipex	pipex;
 
-	pipex.status = 0;
 	if (*envp == NULL)
 		exit(1);
 	if (argc != 5)
@@ -24,11 +23,8 @@ int	main(int argc, char **argv, char *envp[])
 	init_pipex(&pipex, argv, envp);
 	if (pipe(pipex.pipefd) < 0)
 		free_parent(&pipex);
-	while (pipex.status < 2)
-	{
-		children(&pipex, argv, envp);
-		pipex.status += 1;
-	}
+	children1(&pipex, argv, envp);
+	children2(&pipex, argv, envp);
 	waitpid(-1, NULL, 0);
 	free_parent(&pipex);
 	return (0);

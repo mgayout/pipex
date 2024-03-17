@@ -6,37 +6,21 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:22:35 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:18:42 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 17:49:37 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../pipex_bonus.h"
 
-void	children(t_pipex *pipex, char **argv, char **envp, int i)
+void	children(t_pipex *pipex, int argc, char **argv, char **envp)
 {
-	pipex->pid = fork();
-	if (!pipex->pid)
+	pipex->cmd = ft_split(argv[2 + pipex->heredoc + pipex->status], ' ');
+	pipex->cmd_path = check_cmd(pipex, pipex->cmd, pipex->cmd[0]);
+	if (!pipex->cmd_path)
 	{
-		if (pipex->status == 1)
-			in_out(pipex->infile, pipex->pipefd[1]);
-		else if (pipex->status > 1 && pipex->status < pipex->nb_cmd)
-			in_out(pipex->pipefd[2 * i - 2], pipex->pipefd[2 * i + 1]);
-		else
-			in_out(pipex->pipefd[2 * i - 2], pipex->outfile);
-		close_pipe(pipex);
-		pipex->cmd = ft_split(argv[2 + pipex->heredoc + i], ' ');
-		pipex->cmd_path = check_cmd(pipex, pipex->cmd);
-		if (!pipex->cmd_path)
-		{
-			free_children(pipex, argv);
-			error_msg("Error\nWrong command.\n", 0);
-		}
-		execve(pipex->cmd_path, pipex->cmd, envp);
+		free_children(pipex, argc, argv);
+		error_msg("Error\nWrong command.\n", 0);
 	}
-}
-
-void	in_out(int in, int out)
-{
-	dup2(in, STDIN_FILENO);
-	dup2(out, STDOUT_FILENO);
+	if (execve(pipex->cmd_path, pipex->cmd, envp) == -1)
+		error_msg("error cmd\n", 0);
 }

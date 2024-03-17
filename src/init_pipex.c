@@ -38,7 +38,7 @@ char	*find_path(char	**envp)
 	return (*envp + i);
 }
 
-char	*check_cmd(t_pipex *pipex, char **cmd)
+char	*check_cmd(t_pipex *pipex, char **cmd, char *str)
 {
 	char	*tmp;
 	char	*path;
@@ -55,5 +55,7 @@ char	*check_cmd(t_pipex *pipex, char **cmd)
 		free(path);
 		i++;
 	}
+	if (access(str, 0) == 0)
+		return (str);
 	return (NULL);
 }

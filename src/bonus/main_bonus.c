@@ -6,7 +6,7 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 12:21:08 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 15:18:33 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 17:01:41 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,45 +18,44 @@ int	main(int argc, char **argv, char *envp[])
 
 	if (*envp == NULL)
 		exit(1);
-	pipex.argc = argc;
-	pipex.status = 0;
 	if (argc < 5)
 		error_msg("Error\nThis program needs at least 5 args.\n", 0);
 	init_pipex(&pipex, argc, argv, envp);
-	init_pipe(&pipex);
 	while (pipex.status < pipex.nb_cmd)
 	{
+		if (pipe(pipex.pipefd) == -1)
+			free_parent(&pipex);
+		pipex.pid[pipex.status] = fork();
+		if (pipex.pid[pipex.status] == -1)
+			free_parent(&pipex);
+		open_pipe(&pipex, argc, argv, envp);
 		pipex.status += 1;
-		children(&pipex, argv, envp, pipex.status - 1);
 	}
-	close_pipe(&pipex);
-	waitpid(-1, NULL, 0);
 	free_parent(&pipex);
 	return (0);
 }
 
-void	init_pipe(t_pipex *pipex)
+void	open_pipe(t_pipex *pipex, int argc, char **argv, char **envp)
 {
-	int	i;
-
-	i = 0;
-	while (i < pipex->nb_cmd - 1)
+	if (!pipex->pid[pipex->status])
 	{
-		if (pipe(pipex->pipefd + 2 * i) < 0)
-			free_parent(pipex);
-		i++;
+		if (pipex->status < pipex->nb_cmd - 1)
+		{
+			close(pipex->pipefd[0]);
+			dup2(pipex->pipefd[1], STDOUT_FILENO);
+			children(pipex, argc, argv, envp);
+		}
+		else
+		{
+			dup2(pipex->outfile, STDOUT_FILENO);
+			children(pipex, argc, argv, envp);
+		}
 	}
-}
-
-void	close_pipe(t_pipex *pipex)
-{
-	int	i;
-
-	i = 0;
-	while (i < pipex->nb_pipe)
+	else
 	{
-		close(pipex->pipefd[i]);
-		i++;
+		dup2(pipex->pipefd[0], STDIN_FILENO);
+		close(pipex->pipefd[1]);
+		waitpid(pipex->pid[pipex->status], NULL, 0);
 	}
 }
 

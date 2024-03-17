@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   free_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/13 12:28:55 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:16:50 by mgayout          ###   ########.fr       */
+/*   Updated: 2024/03/13 16:58:05 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	free_pipe(t_pipex *pipex)
 	close(pipex->outfile);
 	if (pipex->heredoc == 1)
 		unlink("temp");
-	free(pipex->pipefd);
 	error_msg("Error\nCommand path not found.\n", 0);
 }
 
@@ -37,16 +36,15 @@ void	free_parent(t_pipex *pipex)
 		i++;
 	}
 	free(pipex->path_cmd);
-	free(pipex->pipefd);
 }
 
-void	free_children(t_pipex *pipex, char **argv)
+void	free_children(t_pipex *pipex, int argc, char **argv)
 {
 	int	i;
 
 	i = 0;
 	if (pipex->heredoc == 1)
-		unlink(argv[pipex->argc -1]);
+		unlink(argv[argc -1]);
 	while (pipex->cmd[i])
 	{
 		free(pipex->cmd[i]);
@@ -61,5 +59,4 @@ void	free_children(t_pipex *pipex, char **argv)
 	free(pipex->path_cmd);
 	free(pipex->cmd);
 	free(pipex->cmd_path);
-	free(pipex->pipefd);
 }
