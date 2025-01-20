@@ -6,54 +6,69 @@
 #    By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/05 12:39:21 by mgayout           #+#    #+#              #
-#    Updated: 2024/03/13 17:38:19 by mgayout          ###   ########.fr        #
+#    Updated: 2025/01/14 16:16:30 by mgayout          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	=	pipex
-CC		=	gcc
-CFLAGS	=	-Wextra -Wall -Werror -g3
-REMOVE	=	rm -f
-SRC_DIR	=	./src/
-SRC_B	=	./src/bonus/
-LIBFT	=	./libft-/libft.a
+NAMEB	=	pipex_bonus
 
-SRC		=	src/main.c \
-			src/init_pipex.c \
-			src/children.c \
-			src/free.c \
+FLAG	=	-Wextra -Wall -Werror
 
-SRC_B	=	src/bonus/main_bonus.c \
-			src/bonus/init_pipex_bonus.c \
-			src/bonus/children_bonus.c \
-			src/bonus/free_bonus.c \
+SRCDIR	= src
+SRCBDIR	= bonus
+HEADIR	= include
 
-ifndef WITH_BONUS
-SRCS			=	$(SRC)
-else
-SRCS			=	$(SRC_B)
-endif
+SRC		= $(shell find $(SRCDIR) -name '*.c')
+SRCB	= $(shell find $(SRCBDIR) -name '*.c')
 
-all: $(LIBFT) $(NAME)
 
-$(NAME): $(LIBFT)
-			$(CC) $(SRCS) $(LIBFT) $(CFLAGS) -o $(NAME)
+PRINTFDIR	=	ft_printf-main
+PRINTFURL	=	https://github.com/mgayout/ft_printf/archive/refs/heads/main.tar.gz
+PRINTFAR	=	libftprintf.a
+
+GNLDIR		=	get_next_line-main
+GNLURL		=	https://github.com/mgayout/get_next_line/archive/refs/heads/main.tar.gz
+GNLAR		=	get_next_line.a
+
+AR			=	$(PRINTFDIR)/$(PRINTFAR) $(GNLDIR)/$(GNLAR)
+
+all: $(NAME)
+
+$(NAME): $(PRINTFAR) $(GNLAR)
+			@gcc $(SRC) $(AR) $(FLAG) -o $(NAME)
 			
-bonus:
-			@make WITH_BONUS=1 all
+bonus: $(NAMEB)
 
-$(LIBFT):
-			@make -C libft-/
+$(NAMEB): $(PRINTFAR) $(GNLAR)
+			@gcc $(SRCB) $(AR) $(FLAG) -o $(NAMEB)
 
-clean:	
-			@make clean -C libft-/
+$(PRINTFAR): 
+					@if [ ! -d $(PRINTFDIR) ]; then \
+						curl -L $(PRINTFURL) -o printf.tar.gz; \
+						tar -xzf printf.tar.gz; \
+						rm printf.tar.gz; \
+					fi
+					@make -C $(PRINTFDIR)
 
-fclean:		clean
-			$(REMOVE) $(NAME)
-			$(REMOVE) $(LIBFT)
+$(GNLAR):
+					@if [ ! -d $(GNLDIR) ]; then \
+						curl -L $(GNLURL) -o gnl.tar.gz; \
+						tar -xzf gnl.tar.gz; \
+						rm gnl.tar.gz; \
+					fi
+					@make -C $(GNLDIR)
+
+clean:
+			@make clean -C $(PRINTFDIR)
+			@make clean -C $(GNLDIR)
+
+fclean: clean
+			@rm -rf $(NAME) $(NAMEB)
+			@rm -rf $(PRINTFDIR) $(GNLDIR)
 
 re: fclean all
 
-rebonus: fclean ${NAME}
+rebonus: fclean bonus
 
-.PHONY: all clean fclean re bonus rebonus
+.PHONY: all bonus clean fclean re rebonus

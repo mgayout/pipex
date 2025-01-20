@@ -6,11 +6,11 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/07 10:54:35 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 15:19:34 by mgayout          ###   ########.fr       */
+/*   Updated: 2025/01/14 16:21:13 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../include/pipex.h"
 
 void	children(t_pipex *pipex, char **argv, char **envp)
 {
@@ -23,7 +23,7 @@ void	children(t_pipex *pipex, char **argv, char **envp)
 			in_out(pipex->pipefd[0], pipex->outfile);
 		close_pipe(pipex);
 		pipex->cmd = ft_split(argv[2 + pipex->status], ' ');
-		pipex->cmd_path = check_cmd(pipex, pipex->cmd);
+		pipex->cmd_path = check_cmd(pipex, pipex->cmd, argv[2 + pipex->status]);
 		if (!pipex->cmd_path)
 		{
 			free_children(pipex);

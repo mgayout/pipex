@@ -6,11 +6,11 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/06 09:46:19 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 14:59:26 by mgayout          ###   ########.fr       */
+/*   Updated: 2025/01/14 16:04:51 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../include/pipex.h"
 
 void	init_pipex(t_pipex *pipex, char **argv, char **envp)
 {

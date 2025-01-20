@@ -6,11 +6,11 @@
 /*   By: mgayout <mgayout@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/05 12:42:22 by mgayout           #+#    #+#             */
-/*   Updated: 2024/03/13 16:47:19 by mgayout          ###   ########.fr       */
+/*   Updated: 2025/01/14 16:04:52 by mgayout          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../pipex.h"
+#include "../include/pipex.h"
 
 int	main(int argc, char **argv, char *envp[])
 {
